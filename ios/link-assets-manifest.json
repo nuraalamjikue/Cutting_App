@@ -1,0 +1,33 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/MochiyPopOne-Regular.ttf",
+      "sha1": "18a1236fa35e3d0b5e3b50142195266f3ea58df8"
+    },
+    {
+      "path": "assets/fonts/work-sans.black-italic.ttf",
+      "sha1": "f3d0917e12deed1f4475957c8f8e8f985b84cf8b"
+    },
+    {
+      "path": "assets/fonts/WorkSans-Bold.ttf",
+      "sha1": "29ee9214b2baa985b6ca8f1474a5d3c799a4fe81"
+    },
+    {
+      "path": "assets/fonts/WorkSans-ExtraBold.ttf",
+      "sha1": "26d9971e704d3a8eb3110da3d06f402b18037a14"
+    },
+    {
+      "path": "assets/fonts/WorkSans-Medium.ttf",
+      "sha1": "b95c7b1d3a5130d2d87e86f91eb397a428b4ba43"
+    },
+    {
+      "path": "assets/fonts/WorkSans-Regular.ttf",
+      "sha1": "943c38fa3c44e48acc89c9547e30dc57991cb150"
+    },
+    {
+      "path": "assets/fonts/WorkSans-SemiBold.ttf",
+      "sha1": "d118e3c6fd7618bd7b36072336e5710871c99cc0"
+    }
+  ]
+}
