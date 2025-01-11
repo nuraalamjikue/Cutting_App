@@ -86,14 +86,14 @@ import {login} from '../redux/slices/authSlice';
 import StyledInput from '../components/Inputfield/StyledInput';
 import Toast from 'react-native-toast-message';
 import Spinner from 'react-native-loading-spinner-overlay';
-
+import {jwtDecode} from 'jwt-decode';
 import globalStyles from '../components/styles/globalStyles';
 import {instance, instanceERP} from '../Axiosinstance';
 
-type DecodedToken = {
-  userid: string;
+interface DecodedToken {
+  employeeCode?: string;
   [key: string]: any;
-};
+}
 const LoginScreen = ({navigation}: any) => {
   const dispatch = useDispatch();
   const scheme = useColorScheme() || 'light';
@@ -122,21 +122,22 @@ const LoginScreen = ({navigation}: any) => {
     console.log('loading');
 
     try {
-      console.log('instanceERP:', JSON.stringify(instanceERP)); // Logs the Axios instance
-
+      //console.log('instanceERP:', JSON.stringify(instanceERP)); // Logs the Axios instance
       const response = await instanceERP.post('Login/DoLogin', {
         userName: employeeCode,
         password: password,
       });
-
-      console.log('Login Response:', response);
-
       const result: {token?: string; message?: string} = response.data;
-
-      console.log('token: ' + JSON.stringify(result.token, null, 2));
-
       if (result.token) {
-        handlesearchEmployeeinfodata(result.token);
+        const decoded: DecodedToken = jwtDecode(result.token);
+        dispatch(
+          login({
+            employeeCode: decoded?.username,
+            employeeName: decoded?.fullname,
+            userID: decoded?.userid,
+            token: result.token,
+          }),
+        );
       } else {
         showToast('error', 'Invalid credentials');
       }
@@ -146,54 +147,6 @@ const LoginScreen = ({navigation}: any) => {
       showToast('error', errorMessage);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handlesearchEmployeeinfodata = async (token: string) => {
-    console.log('Line Setup');
-
-    setIsLoading(true);
-    try {
-      const response = await instance.post('Login/search', {
-        company: 'string',
-        id: 0,
-        employeeCode: employeeCode,
-        punchCardNo: 'string',
-        employeeName: 'string',
-        designation: 'string',
-        department: 'string',
-        floor: 'string',
-        line: 'string',
-        section: 'string',
-        mobileNo: 'string',
-        doj: 'string',
-        names: 'string',
-        photo: 'string',
-      });
-
-      if (response.data) {
-        console.log('response.data' + JSON.stringify(response.data.UserId));
-
-        dispatch(
-          login({
-            employeeCode: employeeCode,
-            employeeName: response.data.EmployeeName,
-            userID: response.data.UserId,
-            token: token,
-          }),
-        );
-        navigation.navigate('Home');
-        setPassword('');
-        setEmployeeCode('');
-      } else {
-        showToast('error', 'Failed to insert data');
-      }
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || 'Failed to connect to the server';
-      showToast('error', errorMessage);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -228,7 +181,7 @@ const LoginScreen = ({navigation}: any) => {
             onPress={handleLogin}
             disabled={!employeeCode || !password}>
             <Text style={globalStyles(scheme).login_loginButtonText}>
-              Login
+              Login test
             </Text>
           </TouchableOpacity>
 

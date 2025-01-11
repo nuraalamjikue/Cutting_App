@@ -21,17 +21,20 @@ const MenuHeader: React.FC = ({navigation}: any) => {
   const hideMenu = (): void => setVisible(false);
   const showMenu = (): void => setVisible(true);
   // const getEmployeeCode = useSelector((state: RootState) => state.auth.user);
-  const RoleID = useSelector((state: RootState) => state.auth.user);
-  console.log('isLoggedIn', RoleID?.userID);
+  const gettoken = useSelector((state: RootState) => state.auth.user);
+  //console.log('isLoggedIn /// ---', gettoken);
 
   const handleLogout = () => {
     dispatch(logout());
   };
 
   useEffect(() => {
+    if (!gettoken) {
+      return;
+    }
     const getImage = () => {
       instance
-        .get(`/Cutting/ProfileImage/${RoleID?.employeeCode}/${RoleID?.userID}`)
+        .get(`/Cutting/ProfileImage/${gettoken?.employeeCode}/0`)
         .then((res: any) => {
           setImageUrl(res.data.imgURL);
           //console.log('isLoggedIn -----------------', res.data.imgURL);

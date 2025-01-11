@@ -25,7 +25,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const MainApp = () => {
   const isLoggedIn = useSelector((state: RootState) => state.auth.isLoggedIn);
   const user = useSelector((state: RootState) => state.auth.user);
-  console.log('isLoggedIn', user);
+  //console.log('isLoggedIn 777 ---- ', user);
 
   return (
     <NavigationContainer>
@@ -49,18 +49,20 @@ const MainApp = () => {
         })}>
         {isLoggedIn ? (
           <>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen
+            {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
+            {/* <Stack.Screen
               name="Employeeinfodata"
               component={Employeeinfodata}
               options={{headerShown: true}}
-            />
+            /> */}
 
-            <Stack.Screen
+            <Stack.Screen name="LaywiseCutting" component={LaywiseCutting} />
+
+            {/* <Stack.Screen
               name="LaywiseCutting"
               component={LaywiseCutting}
               options={{headerShown: true}}
-            />
+            /> */}
 
             <Stack.Screen
               name="LaywiseCuttingEdit"

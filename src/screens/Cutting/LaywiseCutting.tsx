@@ -91,31 +91,32 @@ const LaywiseCutting = () => {
     buyerID: string | number,
   ) => {
     try {
-      // API Request Configuration
-      const endpoint = 'Laycutting/Cut_Lay_Prod_Search_Grid/';
+      // Prepare request data
       const requestData = {
-        param1: buyerID || 0,
+        param1: floorID,
         param2: 0,
         param3: 0,
         param4: 0,
-        param5: floorID || 0,
-      };
-      const config = {
-        headers: {
-          Authorization: `Bearer ${gettoken?.token}`,
-          'Content-Type': 'application/json',
-        },
+        param5: buyerID,
       };
 
-      // API Call
-      const response = await instanceERP.post(endpoint, requestData, config);
-      console.log(
-        'Response' + JSON.stringify(response.data.res.items, null, 2),
+      console.log(requestData);
+
+      // Make the API request
+      const response = await instanceERP.post(
+        `Laycutting/Cut_Lay_Prod_Search_Grid/?param1=${floorID}&param2=0&param3=0&param4=0&param5=${buyerID}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${gettoken?.token}`,
+            'Content-Type': 'application/json',
+          },
+        },
       );
 
       // Handle API Response
       if (response?.data?.res?.items) {
-        setCuttingdata(response.data.res.items); // Update state with response data
+        setCuttingdata(response.data.res.items);
       } else {
         console.warn('No items found in response data');
       }
@@ -273,7 +274,7 @@ const LaywiseCutting = () => {
               placeholder="Select Floor"
               searchPlaceholder="Search Floor"
               onChange={(item: BuyerItem) => {
-                setBuyerValue(item.value);
+                setFloorValue(item.value);
               }}
               width={300}
             />
