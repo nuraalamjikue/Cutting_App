@@ -5,6 +5,7 @@ import {
   useColorScheme,
   TouchableOpacity,
   Image,
+  Dimensions,
 } from 'react-native';
 import {Menu, MenuItem, MenuDivider} from 'react-native-material-menu';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -46,6 +47,8 @@ const MenuHeader: React.FC = ({navigation}: any) => {
     getImage();
   }, []);
 
+  const diameter = width * 0.06;
+
   return (
     <View
       style={{height: '100%', alignItems: 'center', justifyContent: 'center'}}>
@@ -63,10 +66,10 @@ const MenuHeader: React.FC = ({navigation}: any) => {
               {imageUrl ? (
                 <Image
                   style={{
-                    width: 50,
-                    height: 50,
+                    width: diameter, // Equal width and height
+                    height: diameter,
+                    borderRadius: diameter / 2, // Half of the diameter ensures a perfect circle
                     resizeMode: 'cover',
-                    borderRadius: 25,
                   }}
                   source={{uri: imageUrl}}
                 />
@@ -96,4 +99,5 @@ const MenuHeader: React.FC = ({navigation}: any) => {
   );
 };
 
+const {width, height} = Dimensions.get('window');
 export default MenuHeader;

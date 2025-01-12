@@ -1,5 +1,12 @@
 import React from 'react';
-import {Pressable, Text, StyleSheet, ViewStyle, TextStyle} from 'react-native';
+import {
+  Pressable,
+  Text,
+  StyleSheet,
+  ViewStyle,
+  TextStyle,
+  Dimensions,
+} from 'react-native';
 
 type GlobalButtonProps = {
   title: string;
@@ -37,18 +44,18 @@ const GlobalButton: React.FC<GlobalButtonProps> = ({
     </Pressable>
   );
 };
-
+const {width, height} = Dimensions.get('window');
 const styles = StyleSheet.create({
   button: {
     backgroundColor: '#6200EE',
-    paddingVertical: 12,
+    paddingVertical: height * 0.012,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 3,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: height * 0.012,
     color: '#FFFFFF',
     fontWeight: 'bold',
   },

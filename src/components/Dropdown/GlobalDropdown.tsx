@@ -40,6 +40,7 @@ const GlobalDropdown: React.FC<GlobalDropdownProps> = ({
       iconStyle={[styles.iconStyle]}
       itemTextStyle={{
         color: '#000',
+        fontSize: height * 0.015,
       }}
       data={data}
       search
@@ -53,7 +54,7 @@ const GlobalDropdown: React.FC<GlobalDropdownProps> = ({
     />
   );
 };
-//const {width, height} = Dimensions.get('window');
+const {width, height} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   dropdown: {
@@ -63,20 +64,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 8,
     backgroundColor: '#fff',
-
-    height: 50,
+    height: height * 0.04,
   },
   placeholderStyle: {
     color: '#000',
-    fontSize: 14,
+    fontSize: height * 0.015,
   },
   selectedTextStyle: {
-    fontSize: 14,
+    fontSize: height * 0.015,
     color: '#000',
   },
   inputSearchStyle: {
     height: 40,
-    fontSize: 14,
+    fontSize: height * 0.015,
     color: '#000',
   },
   iconStyle: {

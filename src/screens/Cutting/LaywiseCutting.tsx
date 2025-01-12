@@ -276,7 +276,7 @@ const LaywiseCutting = () => {
               onChange={(item: BuyerItem) => {
                 setFloorValue(item.value);
               }}
-              width={300}
+              width={width * 0.3}
             />
           </View>
           <View style={{width: width * 0.4}}>
@@ -288,10 +288,10 @@ const LaywiseCutting = () => {
                 setBuyerValue(item.value);
               }}
               // style={{marginBottom: 20}}
-              width={300}
+              width={width * 0.3}
             />
           </View>
-          <View style={{width: width * 0.18}}>
+          <View style={{width: width * 0.16}}>
             <GlobalButton
               //title={buyerValue ? 'Fetch Data' : 'Select a Buyer First'}
               title={'Fetch Data'}
@@ -412,7 +412,7 @@ const LaywiseCutting = () => {
     </View>
   );
 };
-
+const {width, height} = Dimensions.get('window');
 const style = StyleSheet.create({
   container: {
     flex: 1,
@@ -461,7 +461,7 @@ const style = StyleSheet.create({
     borderColor: '#ccc',
   },
   listText: {
-    fontSize: 16,
+    fontSize: height * 0.012,
     color: '#fff',
   },
   imageContainer: {

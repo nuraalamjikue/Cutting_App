@@ -181,7 +181,7 @@ const LoginScreen = ({navigation}: any) => {
             onPress={handleLogin}
             disabled={!employeeCode || !password}>
             <Text style={globalStyles(scheme).login_loginButtonText}>
-              Login test
+              Login
             </Text>
           </TouchableOpacity>
 

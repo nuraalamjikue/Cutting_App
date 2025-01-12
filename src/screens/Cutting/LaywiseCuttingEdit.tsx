@@ -35,6 +35,20 @@ interface LaywiseDetailDataData {
   LayQty: number;
   RollCode: string;
   QtyYds: number;
+  rollNoQr: number;
+  Consignment: number;
+}
+interface TableRowData {
+  rollNoQr: number;
+  shadeNo: number;
+  RollNo: number;
+  consignment: number;
+  shinkage: number;
+  shadeColor: string;
+  rollQty: number;
+  layer: number;
+  totallay: number;
+  totalLay: number;
 }
 type RollDropdownOption = {
   label: string;
@@ -50,6 +64,9 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
   const flexD = 'column';
   const getToken = useSelector((state: RootState) => state.auth.user?.token);
   const [detailData, setDetailData] = useState<LaywiseDetailDataData[]>([]);
+  const [laywisecutdetails, setLaywisecutdetails] = useState<TableRowData[]>(
+    [],
+  );
   const [layMarker, setLayMarker] = useState([]);
   const [masterId, setMasterId] = useState<number>();
   const [cutNo, setCutNo] = useState<number>();
@@ -236,9 +253,6 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
         value: item.value,
         label: item.label,
       }));
-
-      console.log('newArray' + JSON.stringify(newArray, null, 2));
-
       // Update the state with the new options
       setRollQROption(newArray);
     } catch (error: any) {
@@ -330,15 +344,13 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
     if (detailData.length > 0) {
       detailData.forEach(element => {
         totalLayQty =
-          parseInt(totalLayQty.toString()) +
-          parseInt(element.LayQty.toString());
+          parseInt(totalLayQty.toString()) + parseInt(element.LayQty);
       });
     }
 
     vTotalUsedQty = (parseInt(value.toString()) * layMarker.Length).toFixed(2);
     setTotalLay(parseInt(totalLayQty.toString()));
     setTotalUsedQty(vTotalUsedQty);
-
     setShort(
       (
         parseFloat(vCutPc) +
@@ -359,9 +371,29 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
     setShort(Number(shortQty.toFixed(2)));
   };
 
+  const HandleLaywiseCutDetails = () => {
+    // Ensure `tableRowData` has all required fields
+    const tableRowData: LaywiseDetailDataData = {
+      RollCode: selectedRollQR.value ? selectedRollQR.value : '0',
+      Color: shadeColor || '0',
+      RollNo: rollNo || null,
+      Consignment: consignment || 0,
+      shadeNo: shadeNo || null,
+      shinkage: shinkage || null,
+      rollQty: rollQty || null,
+      layer: layer,
+      totalLay: totalLay,
+    };
+
+    // Update the state correctly
+    setDetailData([...detailData, tableRowData]);
+  };
+
   // const handleColorDropdownChange = (option: ColorDropdownOption) => {
   //   setSelectedShadeColor(option);
   // };
+
+  console.log('detailData', JSON.stringify(detailData, null, 2));
 
   if (loading) {
     return (
@@ -400,7 +432,7 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
                   placeholder="Select Roll"
                   searchPlaceholder="Search Roll"
                   onChange={handleRollDropdownChange}
-                  width={500}
+                  width={width * 0.6}
                 />
               </View>
               <View style={{width: '20%'}}>
@@ -480,6 +512,7 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
                         totalLayQtyCalculation(Number(text));
                       }}
                       keyboardType="numeric"
+                      width={width * 0.25}
                     />
                   </View>
                   <View style={styles.column}>
@@ -494,6 +527,7 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
                         totalShortQtyCalculation(Number(text));
                       }}
                       keyboardType="numeric"
+                      width={width * 0.25}
                     />
                   </View>
 
@@ -505,6 +539,7 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
                       placeholder="Enter Remarks"
                       value={remarks}
                       onChangeText={setRemarks}
+                      width={width * 0.25}
                     />
                   </View>
                 </View>
@@ -518,7 +553,7 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
                       value={totalLay.toString()}
                       onChangeText={() => null}
                       editable={false}
-                      width={180}
+                      width={width * 0.25}
                     />
                   </View>
 
@@ -531,7 +566,7 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
                       value={totalUsedQty.toString()}
                       onChangeText={() => null}
                       editable={false}
-                      width={168}
+                      width={width * 0.25}
                     />
                   </View>
 
@@ -544,14 +579,10 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
                       value={short.toString()}
                       onChangeText={() => null}
                       editable={false}
-                      width={153}
+                      width={width * 0.25}
                     />
                   </View>
                 </View>
-              </View>
-
-              <View style={{backgroundColor: 'red'}}>
-                <Text>Hello</Text>
               </View>
             </View>
 
@@ -562,15 +593,113 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
               }}>
               <GlobalButton
                 title={layer && cutpc ? 'Submit' : 'Enter layer and Cut Pc Qty'}
-                //title={'Submit'}
-                onPress={() => console.log('Submit')}
+                onPress={HandleLaywiseCutDetails}
                 disabled={!layer && !cutpc}
-                // fontSize={ 16}
                 buttonStyle={{
                   backgroundColor: layer && cutpc ? '#6200EE' : '#BDBDBD',
-                  //backgroundColor: '#6200EE',
                 }}
               />
+
+              <View
+                style={{
+                  backgroundColor: '#f8f9fa',
+                  marginTop: 10,
+                  padding: 10,
+                  borderRadius: 10,
+                }}>
+                <Text
+                  style={{
+                    color: '#343a40',
+                    fontSize: 18,
+                    fontWeight: 'bold',
+                    marginBottom: 10,
+                    textAlign: 'center',
+                  }}>
+                  Laywise Cut Details
+                </Text>
+
+                {/* Table Header */}
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    backgroundColor: '#6c757d',
+                    paddingVertical: 10,
+                    borderRadius: 5,
+                  }}>
+                  <Text
+                    style={{
+                      flex: 1,
+                      color: 'white',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                      fontSize: height * 0.012,
+                    }}>
+                    ROLL QR
+                  </Text>
+                  <Text
+                    style={{
+                      flex: 1,
+                      color: 'white',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                      fontSize: height * 0.012,
+                    }}>
+                    SHADE COLOR
+                  </Text>
+                  <Text
+                    style={{
+                      flex: 1,
+                      color: 'white',
+                      fontWeight: 'bold',
+                      textAlign: 'center',
+                      fontSize: height * 0.012,
+                    }}>
+                    ROLL NO
+                  </Text>
+                </View>
+
+                {/* Table Rows */}
+                {detailData.map((detail, index) => (
+                  <View
+                    key={index}
+                    style={{
+                      flexDirection: 'row',
+                      backgroundColor: index % 2 === 0 ? '#e9ecef' : '#f8f9fa', // Alternating row colors
+                      paddingVertical: 10,
+                      borderBottomWidth:
+                        index === detailData.length - 1 ? 0 : 1,
+                      borderBottomColor: '#dee2e6',
+                    }}>
+                    <Text
+                      style={{
+                        flex: 1,
+                        color: '#495057',
+                        textAlign: 'center',
+                        fontSize: height * 0.012,
+                      }}>
+                      {detail.RollCode}
+                    </Text>
+                    <Text
+                      style={{
+                        flex: 1,
+                        color: '#495057',
+                        textAlign: 'center',
+                        fontSize: height * 0.012,
+                      }}>
+                      {detail.Color}
+                    </Text>
+                    <Text
+                      style={{
+                        flex: 1,
+                        color: '#495057',
+                        textAlign: 'center',
+                        fontSize: height * 0.012,
+                      }}>
+                      {detail.Consignment}
+                    </Text>
+                  </View>
+                ))}
+              </View>
             </View>
           </View>
         </ScrollView>
@@ -625,7 +754,7 @@ const styles = StyleSheet.create({
   },
 
   cell: {
-    fontSize: width * 0.015,
+    fontSize: width * 0.02,
     color: '#333',
     padding: 12,
     borderRadius: 8,
