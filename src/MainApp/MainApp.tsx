@@ -11,6 +11,7 @@ import {StyleSheet, Text, View} from 'react-native';
 import Employeeinfodata from '../screens/EmployeeInfo/Employeeinfodata';
 import LaywiseCutting from '../screens/Cutting/LaywiseCutting';
 import LaywiseCuttingEdit from '../screens/Cutting/LaywiseCuttingEdit';
+import QRCodescannerSceen from '../screens/Cutting/QRCodescannerSceen';
 
 // const Stack = createNativeStackNavigator();
 type RootStackParamList = {
@@ -19,6 +20,7 @@ type RootStackParamList = {
   Login: undefined;
   LaywiseCutting: undefined;
   LaywiseCuttingEdit: {id: number};
+  QRCodescannerSceen: undefined;
 };
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -67,6 +69,11 @@ const MainApp = () => {
             <Stack.Screen
               name="LaywiseCuttingEdit"
               component={LaywiseCuttingEdit}
+              options={{headerShown: true}}
+            />
+            <Stack.Screen
+              name="QRCodescannerSceen"
+              component={QRCodescannerSceen}
               options={{headerShown: true}}
             />
           </>

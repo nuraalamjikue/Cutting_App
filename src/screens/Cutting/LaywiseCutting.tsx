@@ -256,7 +256,7 @@ const LaywiseCutting = () => {
 
   const handelChangeCuttinglawValue = (id: number) => {
     console.log('id' + id);
-    navigation.navigate('LaywiseCuttingEdit', {id});
+    navigation.navigate('LaywiseCuttingEdit', {id, QrCode: 'exampleQRCode123'});
   };
 
   return (

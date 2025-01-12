@@ -41,7 +41,7 @@ const GlobalTextInput: React.FC<GlobalTextInputProps> = ({
   return (
     <View style={styles.container}>
       <TextInput
-        style={styles.input}
+        style={[styles.input, {width: width || '10%'}]}
         placeholder={placeholder}
         value={value}
         onChangeText={onChangeText}
@@ -57,10 +57,11 @@ const GlobalTextInput: React.FC<GlobalTextInputProps> = ({
 const {width: screenWidth, height} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
-    marginVertical: 10,
+    marginVertical: 1,
   },
   input: {
     height: 50,
+    width: screenWidth * 0.025,
     borderColor: '#D3D3D3',
     borderWidth: 1,
     borderRadius: 6,

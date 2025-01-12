@@ -5,7 +5,8 @@ export type RootStackParamList = {
   Employeeinfodata: undefined; // Add all your routes here
   Login: undefined;
   LaywiseCutting: undefined;
-  LaywiseCuttingEdit: {id: number};
+  LaywiseCuttingEdit: {id: number; QrCode: string};
+  QRCodescannerSceen: {id: number};
 };
 
 export type NavigationProps = NativeStackNavigationProp<RootStackParamList>;

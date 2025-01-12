@@ -8,12 +8,13 @@ import {
   Dimensions,
   SafeAreaView,
   ScrollView,
+  Alert,
 } from 'react-native';
-import {RouteProp} from '@react-navigation/native';
+import {RouteProp, useNavigation} from '@react-navigation/native';
 import {useSelector} from 'react-redux';
 import {instanceERP} from '../../Axiosinstance';
 import {RootState} from '../../redux/store';
-import {RootStackParamList} from '../ParamList';
+import {NavigationProps, RootStackParamList} from '../ParamList';
 import GlobalDropdown from '../../components/Dropdown/GlobalDropdown';
 import GlobalButton from '../../components/Button/GlobalButton';
 import GlobalTextInput from '../../components/Inputfield/GlobalTextInput';
@@ -45,14 +46,20 @@ type ColorDropdownOption = {
 };
 
 const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
-  const {id} = route.params;
+  const {id, QrCode} = route.params;
   const flexD = 'column';
   const getToken = useSelector((state: RootState) => state.auth.user?.token);
   const [detailData, setDetailData] = useState<LaywiseDetailDataData[]>([]);
+  const [layMarker, setLayMarker] = useState([]);
   const [masterId, setMasterId] = useState<number>();
   const [cutNo, setCutNo] = useState<number>();
-  const [layer, setLayer] = useState<string>('');
-  const [cutpc, setCutpc] = useState<string>('');
+  const [layer, setLayer] = useState<number>(0);
+  const [cutpc, setCutpc] = useState<number>(0);
+
+  const [totalLay, setTotalLay] = useState(0);
+  const [totalUsedQty, setTotalUsedQty] = useState<number>(0);
+  const [short, setShort] = useState<number>(0);
+
   const [remarks, setRemarks] = useState<string>('');
   const [rollQROption, setRollQROption] = useState<RollDropdownOption[]>([]);
   const [selectedRollQR, setSelectedRollQR] = useState<RollDropdownOption>({
@@ -66,6 +73,7 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
   const [shinkage, setShinkage] = useState<number | null>(null);
   const [shadeColor, setShadeColor] = useState<string | null>(null);
   const [rollQty, setRollQty] = useState<number | null>(null);
+  const navigation = useNavigation<NavigationProps>();
 
   // const [shadeColorOption, setShadeColorOption] = useState<
   //   ColorDropdownOption[]
@@ -201,6 +209,7 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
       setMasterId(result[0].id);
       setCutNo(result[0].cutno);
       setDetailData(result[0].details);
+      setLayMarker(result[0].Markerratio[0]);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -228,6 +237,8 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
         label: item.label,
       }));
 
+      console.log('newArray' + JSON.stringify(newArray, null, 2));
+
       // Update the state with the new options
       setRollQROption(newArray);
     } catch (error: any) {
@@ -238,6 +249,9 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
   useEffect(() => {
     fetchData();
     loadRollQr();
+    if (QrCode !== 'exampleQRCode123') {
+      fetchRollDetails(QrCode);
+    }
   }, [getToken, id]);
 
   const fetchRollDetails = async (rollid: string | number) => {
@@ -262,8 +276,8 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
         setConsignment(result[0].consignment);
         setShinkage(result[0].shrinkage);
         setShadeColor(result[0].rollcolor);
-        setLayer('');
-        setCutpc('');
+        setLayer(0);
+        setCutpc(0);
         setRemarks('');
         let rollValue = 0;
         if (detailData.length > 0) {
@@ -303,6 +317,48 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
     fetchRollDetails(item.value);
   };
 
+  const handleQrCodeopen = () => {
+    navigation.navigate('QRCodescannerSceen', {id});
+  };
+
+  const totalLayQtyCalculation = (value: number) => {
+    let totalLayQty = value == null ? 0 : value;
+    let vTotalUsedQty = 0;
+    let vRollQty = rollQty == null ? 0 : rollQty;
+    let vCutPc = cutpc == null ? 0 : cutpc;
+
+    if (detailData.length > 0) {
+      detailData.forEach(element => {
+        totalLayQty =
+          parseInt(totalLayQty.toString()) +
+          parseInt(element.LayQty.toString());
+      });
+    }
+
+    vTotalUsedQty = (parseInt(value.toString()) * layMarker.Length).toFixed(2);
+    setTotalLay(parseInt(totalLayQty.toString()));
+    setTotalUsedQty(vTotalUsedQty);
+
+    setShort(
+      (
+        parseFloat(vCutPc) +
+        parseFloat(vTotalUsedQty) -
+        parseFloat(vRollQty)
+      ).toFixed(2),
+    );
+  };
+
+  const totalShortQtyCalculation = (value: number) => {
+    var vRollQty = rollQty == null ? 0 : rollQty;
+    var vCutPC = value == null ? 0 : value;
+    var vtotalUsedQty = totalUsedQty == null ? 0 : totalUsedQty;
+    const shortQty =
+      parseFloat(vtotalUsedQty.toString()) +
+      parseFloat(vCutPC.toString()) -
+      parseFloat(vRollQty.toString());
+    setShort(Number(shortQty.toFixed(2)));
+  };
+
   // const handleColorDropdownChange = (option: ColorDropdownOption) => {
   //   setSelectedShadeColor(option);
   // };
@@ -336,14 +392,35 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
                 flex: 0.5,
                 backgroundColor: '#fff',
                 alignItems: 'center',
+                flexDirection: 'row',
               }}>
-              <GlobalDropdown
-                data={rollQROption || []}
-                placeholder="Select Roll"
-                searchPlaceholder="Search Roll"
-                onChange={handleRollDropdownChange}
-                //width={300}
-              />
+              <View style={{width: '75%'}}>
+                <GlobalDropdown
+                  data={rollQROption || []}
+                  placeholder="Select Roll"
+                  searchPlaceholder="Search Roll"
+                  onChange={handleRollDropdownChange}
+                  width={500}
+                />
+              </View>
+              <View style={{width: '20%'}}>
+                <View style={{width: width * 0.18}}>
+                  <GlobalButton
+                    //title={buyerValue ? 'Fetch Data' : 'Select a Buyer First'}
+                    title={'Scan'}
+                    onPress={() => {
+                      handleQrCodeopen();
+                    }}
+                    // disabled={!buyerValue}
+                    // fontSize={ 16}
+                    buttonStyle={{
+                      // backgroundColor: buyerValue ? '#6200EE' : '#BDBDBD',
+                      backgroundColor: '#6200EE',
+                    }}
+                  />
+                </View>
+              </View>
+
               {/* <GlobalDropdown
                 data={shadeColorOption || []}
                 placeholder="Select Color"
@@ -395,11 +472,14 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
                     <Text style={[styles.headerText, {color: '#333'}]}>
                       Layer
                     </Text>
-
                     <GlobalTextInput
                       placeholder="Enter Layer Name"
-                      value={layer}
-                      onChangeText={setLayer}
+                      value={layer.toString()}
+                      onChangeText={text => {
+                        setLayer(Number(text));
+                        totalLayQtyCalculation(Number(text));
+                      }}
+                      keyboardType="numeric"
                     />
                   </View>
                   <View style={styles.column}>
@@ -408,16 +488,19 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
                     </Text>
                     <GlobalTextInput
                       placeholder="Enter Cut Pc Qty"
-                      value={cutpc}
-                      onChangeText={setCutpc}
+                      value={cutpc.toString()}
+                      onChangeText={text => {
+                        setCutpc(Number(text));
+                        totalShortQtyCalculation(Number(text));
+                      }}
                       keyboardType="numeric"
                     />
                   </View>
+
                   <View style={styles.column}>
                     <Text style={[styles.headerText, {color: '#333'}]}>
                       Remarks
                     </Text>
-
                     <GlobalTextInput
                       placeholder="Enter Remarks"
                       value={remarks}
@@ -425,13 +508,56 @@ const LaywiseCuttingEdit: React.FC<LaywiseCuttingEditProps> = ({route}) => {
                     />
                   </View>
                 </View>
+                <View style={styles.row}>
+                  <View style={styles.column}>
+                    <Text style={[styles.headerText, {color: '#333'}]}>
+                      Total Lay
+                    </Text>
+                    <GlobalTextInput
+                      placeholder="Enter Remarks"
+                      value={totalLay.toString()}
+                      onChangeText={() => null}
+                      editable={false}
+                      width={180}
+                    />
+                  </View>
+
+                  <View style={styles.column}>
+                    <Text style={[styles.headerText, {color: '#333'}]}>
+                      Total Used YDS
+                    </Text>
+                    <GlobalTextInput
+                      placeholder="Enter Remarks"
+                      value={totalUsedQty.toString()}
+                      onChangeText={() => null}
+                      editable={false}
+                      width={168}
+                    />
+                  </View>
+
+                  <View style={styles.column}>
+                    <Text style={[styles.headerText, {color: '#333'}]}>
+                      Short (YDS):
+                    </Text>
+                    <GlobalTextInput
+                      placeholder="Enter Remarks"
+                      value={short.toString()}
+                      onChangeText={() => null}
+                      editable={false}
+                      width={153}
+                    />
+                  </View>
+                </View>
+              </View>
+
+              <View style={{backgroundColor: 'red'}}>
+                <Text>Hello</Text>
               </View>
             </View>
 
             <View
               style={{
                 flex: 1,
-
                 marginTop: height * 0.02,
               }}>
               <GlobalButton
@@ -514,7 +640,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: width * 0.02,
     color: '#fff',
-    marginBottom: 8,
+    marginBottom: 5,
     textAlign: 'center',
   },
   scrollView: {
